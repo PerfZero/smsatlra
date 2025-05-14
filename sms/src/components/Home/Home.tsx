@@ -284,18 +284,20 @@ const Home: React.FC = () => {
                            {goal.packageType && (
                              <>
                                <span className="home__goal-separator">|</span>
-                               <span className="home__goal-package">{goal.packageType.charAt(0).toUpperCase() + goal.packageType.slice(1)}</span>
+                               <span className="home__goal-package">{goal.packageType.charAt(0).toUpperCase() + goal.packageType.slice(1)} Package</span>
                              </>
                            )}
                            <Link to={`/goal/${goal.id}`} className="home__relative-navigate">
                             <span>Подробнее</span>
-                            <img src="/images/arrow-right.svg" alt=">" />
+                            <svg width="7" height="11" viewBox="0 0 7 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M1 1L5.83482 5.35134C5.9231 5.43079 5.9231 5.56921 5.83482 5.64866L1 10" stroke="white" stroke-linecap="round" />
+</svg>
                            </Link>
                          </div>
                        </div>
 
                        <div className="home__progress-section">
-                        <div>
+                        <div className="home__progress-section-circle">
                           <SemiCircleProgress
                             percentage={Math.round(progressPercentage)}
                             size={{
@@ -319,7 +321,7 @@ const Home: React.FC = () => {
                           <div className="home__remaining-amount">
                             {remainingAmount.toLocaleString()} ₸
                             <span className="home__remaining-percentage">
-                              из {goal?.targetAmount.toLocaleString()} ₸
+                              ({Math.round(progressPercentage)}%) 
                             </span>
                           </div>
                         </div>
@@ -396,7 +398,9 @@ const Home: React.FC = () => {
                       
                       <Link to={`/goal/${familyGoal.id}`} className="home__relative-navigate">
                         <span>Перейти</span>
-                        <img src="/images/arrow-right.svg" alt=">" />
+                        <svg width="7" height="11" viewBox="0 0 7 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M1 1L5.83482 5.35134C5.9231 5.43079 5.9231 5.56921 5.83482 5.64866L1 10" stroke="white" stroke-linecap="round" />
+</svg>
                       </Link>
                     </div>
                   </div>
