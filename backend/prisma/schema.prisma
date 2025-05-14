@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int          @id @default(autoincrement())
+  iin         String       @unique
+  phone       String       @unique
+  password    String
+  name        String?
+  role        Role        @default(USER)
+  balance     Balance?
+  goals       Goal[]
+  transactions Transaction[]
+  relatives   Relative[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Balance {
+  id        Int      @id @default(autoincrement())
+  amount    Float    @default(0)
+  bonusAmount Float  @default(0)
+  hasFirstDeposit Boolean @default(false)
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Goal {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  relativeId    Int?     // null если цель для себя
+  type          String   // 'UMRAH' или 'HAJJ'
+  packageType   String   // 'PREMIUM', 'COMFORT', 'STANDARD'
+  targetAmount  Float
+  currentAmount Float    @default(0)
+  monthlyTarget Float    // Целевая сумма ежемесячного взноса
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id])
+  relative      Relative? @relation(fields: [relativeId], references: [id])
+  transactions  Transaction[]
+}
+
+model Relative {
+  id        Int      @id @default(autoincrement())
+  userId    Int      // ID пользователя, который добавил родственника
+  fullName  String
+  iin       String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+  goals     Goal[]
+  transactions Transaction[]
+}
+
+model Transaction {
+  id          Int       @id @default(autoincrement())
+  transactionNumber String  @unique
+  amount      Float
+  type        TransactionType
+  status      TransactionStatus @default(PENDING)
+  userId      Int
+  goalId      Int?     // ID цели, если транзакция связана с конкретной целью
+  relativeId  Int?     // ID родственника, если транзакция связана с родственником
+  user        User      @relation(fields: [userId], references: [id])
+  goal        Goal?     @relation(fields: [goalId], references: [id])
+  relative    Relative? @relation(fields: [relativeId], references: [id])
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum Role {
+  USER
+  ADMIN
+} 

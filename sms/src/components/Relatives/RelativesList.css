@@ -1,0 +1,33 @@
+.relatives-list {
+  padding: 16px;
+}
+
+.relatives-list__title {
+  font-weight: 600;
+  font-size: 24px;
+  color: #222;
+  margin-bottom: 16px;
+}
+
+.relatives-list__cards {
+  position: relative;
+  height: 281px;
+  margin-bottom: 16px;
+}
+
+.relatives-list__add-button {
+  font-weight: 600;
+  font-size: 16px;
+  color: #35c759;
+  border-radius: 16px;
+  padding: 14px 20px;
+  background: rgba(53, 199, 89, 0.1);
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.relatives-list__add-button:hover {
+  background: rgba(53, 199, 89, 0.2);
+} 

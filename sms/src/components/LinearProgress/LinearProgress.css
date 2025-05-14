@@ -1,0 +1,26 @@
+.linear-progress {
+  width: 100%;
+  padding: 10px 0;
+}
+
+.linear-progress__track {
+    border-radius: 4px;
+
+    background: rgba(255, 255, 255, 0.8);
+    padding: 2px;
+    height: 8px;
+    position: relative;
+}
+
+.linear-progress__dot {
+  position: absolute;
+  top: 50%;
+  transform: translate(0, -50%);
+  width: 24px;
+  height: 24px;
+  background-color: #fff;
+  border-radius: 50%;
+  transition: left 0.3s ease;
+  box-shadow: 0 2px 4px -2px rgba(10, 13, 18, 0.06), 0 4px 8px -2px rgba(10, 13, 18, 0.1);
+
+} 

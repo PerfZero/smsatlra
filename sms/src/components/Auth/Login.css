@@ -1,0 +1,307 @@
+.registration__input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.registration__input-group input {
+  border: 1px solid #d5d7da;
+  border-radius: 8px;
+  padding: 10px 14px;
+  height: 48px;
+}
+
+.registration__header {
+  padding: 7px;
+  display: flex;
+  align-items: center;
+  background-color: #F7F8FB;
+  justify-content: center;
+}
+
+.login_title{
+    width: 100%;
+    max-width: 100% !important;
+}
+
+.registration__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.registration__form {
+  height: 100%;
+}
+
+.registration {
+  height: 100dvh;
+  display: flex;
+  padding-bottom: 15px;
+  flex-direction: column;
+}
+
+.registration__input-group:last-child {
+  flex: 1;
+}
+
+.registration__subtitle {
+  font-weight: 600;
+  font-size: 32px;
+  text-align: center;
+  color: #222;
+  margin: 24px auto;
+}
+
+.registration__content {
+  padding: 0 16px;
+}
+
+.registration__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  padding: 14px 20px;
+  width: 100%;
+  background: #35c759;
+  font-weight: 600;
+  font-size: 16px;
+  color: #fff;
+  height: 48px;
+}
+
+.dost_image {
+  padding: 7px;
+  display: flex;
+  align-items: center;
+  margin: 26px 0;
+  justify-content: center;
+}
+
+.registration__title {
+  font-weight: 600;
+  font-size: 32px;
+  text-align: center;
+  color: #222;
+  max-width: 224px;
+  margin: 0 auto 24px;
+  line-height: 1.2;
+}
+
+.registration__input-group input::placeholder {
+  color: #666;
+  font-size: 16px;
+}
+
+.registration__input-group input {
+  width: 320px;
+  box-shadow: 0 1px 2px 0 rgba(10, 13, 18, 0.05);
+  background: #fff;
+}
+
+.registration__input-group:nth-child(2) {
+  flex: 1;
+}
+
+.registration__form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-direction: column;
+}
+
+.registration__input-group input:focus {
+  border-color: #35c759;
+  outline: none;
+}
+
+.registration__input-group input.error {
+  border-color: #FF3B30;
+}
+
+.registration__error {
+  font-weight: 400;
+  font-size: 12px;
+  color: #f14635;
+}
+
+.mbp{
+  margin-top: 0 !important;
+}
+
+.registration__login-link {
+  text-align: center;
+}
+
+.registration__login-link a {
+  font-weight: 500;
+  font-size: 16px;
+  text-decoration: underline !important;
+  text-decoration-skip-ink: none !important;
+  text-align: center;
+  color: #35c759;
+}
+
+.registration__login-link a:hover {
+  text-decoration: underline;
+}
+
+.registration__button:disabled {
+  background: rgba(120, 120, 128, 0.12);
+  cursor: not-allowed;
+  font-weight: 600;
+  font-size: 16px;
+  color: rgba(60, 60, 67, 0.3);
+  opacity: 0.7;
+}
+
+/* New styles for login-specific elements */
+.registration__options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 320px;
+
+}
+
+.registration__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.registration__checkbox input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid #d5d7da;
+  cursor: pointer;
+}
+
+.registration__checkbox label {
+  font-size: 14px;
+  color: #222;
+  cursor: pointer;
+}
+
+.registration__forgot-password a {
+  font-size: 16px;
+  color: #35c759;
+  font-weight: 500;
+  text-decoration: underline !important;
+  text-decoration-skip-ink: none !important;
+}
+
+.registration__forgot-password a:hover {
+  text-decoration: underline;
+} 
+
+.login_dost_image{
+    filter:   sepia(0%) saturate(585%) hue-rotate(310deg) brightness(93%) contrast(100%);
+}
+
+.flex-n{
+    flex: none !important;
+}
+
+.registration__options{
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 8px;
+}
+
+.mn{
+    margin-top: 0 !important;
+
+    font-weight: 500;
+font-size: 16px;
+text-decoration: underline;
+text-decoration-skip-ink: none;
+text-align: center;
+color: #35c759;
+}
+
+.sms-hint {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+}
+
+.registration__checkbox-group {
+  margin: 16px 0;
+  position: relative;
+}
+
+.registration__checkbox {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.registration__checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 400;
+  font-size: 16px;
+  color: #000;
+  justify-content: center;
+  position: relative;
+  padding-left: 28px;
+  width: max-content;
+}
+
+
+
+.registration__checkbox-group{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Кастомный чекбокс */
+.registration__checkbox-label::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid #D5D7DA;
+  border-radius: 4px;
+  background-color: white;
+  transition: all 0.2s ease;
+}
+
+/* При наведении делаем обводку темнее */
+.registration__checkbox-label:hover::before {
+  border-color: #b8babe;
+}
+
+/* Когда чекбокс выбран, меняем цвет обводки на зеленый */
+.registration__checkbox:checked + .registration__checkbox-label::before {
+  border-color: #35c759;
+}
+
+/* Галочка внутри чекбокса */
+.registration__checkbox:checked + .registration__checkbox-label::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 3px;
+  width: 5px;
+  height: 10px;
+  border: solid #35c759;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  transition: all 0.2s ease;
+}
+
+.registration__checkbox-label span {
+  user-select: none;
+}

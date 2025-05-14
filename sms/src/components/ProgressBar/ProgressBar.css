@@ -1,0 +1,31 @@
+.progress-bar {
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.progress-bar__svg {
+  transform: rotate(-180deg);
+}
+
+.progress-bar__background {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-linecap: round;
+}
+
+.progress-bar__progress {
+  fill: none;
+  stroke: #FFFFFF;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+.progress-bar__text {
+  fill: #FFFFFF;
+  font-size: 24px;
+  font-weight: 600;
+  transform: rotate(180deg);
+  transform-origin: center;
+} 

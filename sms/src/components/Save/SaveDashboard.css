@@ -1,0 +1,116 @@
+.save-dashboard {
+  padding: 24px;
+  font-family: "SF Pro Display", sans-serif;
+}
+
+.save-dashboard__title {
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: #1a1a1a;
+}
+
+.save-dashboard__grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.save-dashboard__card {
+  flex: 1 1 300px;
+  min-width: 300px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.save-dashboard__card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.save-dashboard__card--full {
+  width: 100%;
+}
+
+.save-dashboard__card-content {
+  padding: 24px;
+}
+
+.save-dashboard__card-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #1a1a1a;
+}
+
+.save-dashboard__progress {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 24px 0;
+}
+
+.save-dashboard__progress-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: conic-gradient(#35c759 var(--progress), #e0e0e0 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.save-dashboard__progress-circle::before {
+  content: '';
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background: white;
+  border-radius: 50%;
+}
+
+.save-dashboard__progress-text {
+  position: relative;
+  font-size: 24px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.save-dashboard__package-name {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #1a1a1a;
+}
+
+.save-dashboard__package-detail {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.save-dashboard__balance {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.save-dashboard__button {
+  background: #35c759;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  width: 100%;
+}
+
+.save-dashboard__button:hover {
+  background: #2fb750;
+} 

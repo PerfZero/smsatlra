@@ -1,0 +1,101 @@
+.contacts__section-title{
+    font-weight: 600;
+font-size: 32px;
+color: #222;
+}
+
+.contacts__section-titles{
+    font-weight: 400;
+    margin-top: 16px;
+font-size: 13px;
+text-transform: uppercase;
+color: rgba(60, 60, 67, 0.6);
+}
+
+.contacts__info-card{
+    border-radius: 10px;
+    padding: 16px;
+    background: #f7f8fb;
+    margin-top: 16px;
+}
+
+.contacts__info-item{
+    padding: 8px 0 8px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 0.33px solid rgba(84, 84, 86, 0.1);
+
+}
+
+.contacts__info-item:last-child{
+    border-bottom: none;
+}
+
+.contacts__info-label{
+    font-weight: 400;
+font-size: 17px;
+color: rgba(0, 0, 0, 0.5);
+}
+
+.contacts__info-value{
+    font-weight: 500;
+font-size: 17px;
+text-align: right;
+color: #000;
+}
+
+.contacts__info-value--link{
+    font-weight: 500;
+font-size: 17px;
+text-decoration: underline !important;
+text-decoration-skip-ink: none;
+text-align: right;
+color: #35c759;
+}
+
+.contacts__whatsapp-button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 10px;
+    background: #35c759;
+    font-weight: 500;
+font-size: 16px;
+text-align: center;
+color: #fff;
+height: 48px;
+width: 100%;
+margin-top: 16px;
+}
+
+
+@media screen and (min-width: 768px) {
+  .contacts{
+    max-width: 100%;
+    margin: 0 auto;
+  }
+  .contacts__content{
+    max-width: 650px;
+    padding: 0 10px;
+    margin: 0 auto;
+  }
+
+  .contacts__section-title{
+    font-weight: 600;
+font-size: 32px;
+color: #222;
+}
+
+.contacts__section-titles{
+    font-weight: 400;
+font-size: 13px;
+text-transform: uppercase;
+color: rgba(60, 60, 67, 0.6);
+}
+
+  
+  
+}
+
+
