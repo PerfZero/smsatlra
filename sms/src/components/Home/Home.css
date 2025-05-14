@@ -287,7 +287,7 @@ width: 100%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 1;
   transition: all 0.3s ease;
-  height: 70px;
+  height: 66px;
   overflow: hidden;
 }
 
@@ -799,7 +799,13 @@ border-radius: 64px;
   .home__remaining-section{
     border-left: 1px solid rgba(255, 255, 255, 0.3);
     border-top: none;
+
+    flex: 1;
     padding: 16px;
+  }
+
+  .home__progress-section-circle{
+    flex: 1;
   }
 
   .home__remaining-amount{

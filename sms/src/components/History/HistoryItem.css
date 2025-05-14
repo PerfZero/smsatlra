@@ -1,15 +1,6 @@
-.history-item {
-  background: #fff;
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
 
-.history-item:hover {
-  background-color: #f5f5f5;
-}
+
+
 
 .history-item__main {
   display: flex;
@@ -69,17 +60,14 @@
 }
 
 .history-item__amount {
-  font-weight: 600;
+  font-weight: 400;
   font-size: 16px;
 }
 
-.history-item__amount--positive {
-  color: #4CAF50;
+.history-item__main{
+  gap: 10px;
 }
 
-.history-item__amount--negative {
-  color: #F44336;
-}
 
 .history-item__status {
   font-size: 12px;
@@ -168,7 +156,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -177,8 +165,10 @@
 
 .modal__content {
   background: #fff;
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1);
+background: #f2f2f7;
   border-radius: 12px;
-  padding: 24px;
+  padding: 48px 24px 24px;
   width: 90%;
   max-width: 500px;
   position: relative;
@@ -188,7 +178,7 @@
 
 .modal__close {
   position: absolute;
-  top: 16px;
+  top: 8px;
   right: 16px;
   background: none;
   border: none;
@@ -206,16 +196,22 @@
   justify-content: space-between;
   margin-bottom: 16px;
   padding-bottom: 8px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 0.33px solid rgba(84, 84, 86, 0.1);
+
+}
+
+.modal__row:last-child {
+  border-bottom: none;
 }
 
 .modal__label {
   color: #666;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .modal__value {
   color: #333;
+  font-size: 12px;
   font-weight: 500;
   text-align: right;
 }
