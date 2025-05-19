@@ -107,6 +107,17 @@ width: 100%;
 .mobile-only {
   display: none;
 }
+
+
+.onboarding__right{
+  height: 100%;
+}
+
+
+.onboarding__content .onboarding__skip-button{
+  display: none;
+}
+
 @media (max-width: 768px) {
   .desktop-only {
     display: none;

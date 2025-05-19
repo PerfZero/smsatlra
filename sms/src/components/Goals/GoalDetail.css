@@ -45,10 +45,10 @@
   margin: 16px 0;
 }
 
-.goal-detail__remaining-section {
+/* .goal-detail__remaining-section {
   text-align: center;
   margin-top: -20px;
-}
+} */
 
 .goal-detail__section-title {
   font-size: 18px;
@@ -60,6 +60,29 @@
 .goal-detail__package-info,
 .goal-detail__transactions {
   margin-top: 8px;
+}
+
+.goal-detail__cards .home__balance-label--active{
+  color:#000;
+}
+
+.history__buttons{
+  color: #35C759;
+
+  font-family: SF Pro Display;
+font-weight: 600;
+font-size: 18px;
+line-height: 100%;
+letter-spacing: 0px;
+border-radius: 16px;
+background: #35C75926;
+height: 50px;
+background-color: #35C75926;
+display: flex;
+justify-content: center;
+align-items: center;
+
+margin: 0 auto 16px;
 }
 
 .goal-detail__package-card {
@@ -140,4 +163,62 @@
 .goal-detail__transaction-value {
   color: #333;
   font-weight: 500;
+}
+
+/* --- Стили для блока информации о пакете в деталях цели --- */
+.package-main-info {
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.package-main-info__icon {
+  width: 120px;
+  height: 120px;
+  border-radius: 24px;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.goal-detail__icon {
+  width: 48px;
+  height: 48px;
+  color: #fff;
+  display: block;
+}
+.package-main-info__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.package-main-info__name {
+  font-weight: 600;
+  font-size: 22px;
+}
+.package-main-info__type {
+  color: #888;
+  font-size: 18px;
+  margin-top: 2px;
+}
+.package-main-info__price {
+  margin-top: auto;
+}
+.package-main-info__price-badge {
+  background:
+  linear-gradient(118.46deg, #AF52DE 0%, #5F2C78 100%);
+  
+  color: #fff;
+  border-radius: 20px;
+  padding: 6px 20px;
+  font-weight: 600;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.package-main-info__price-icon {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
 } 

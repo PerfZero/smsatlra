@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
-import { goalService } from '../../services/api';
+import api from '../../services/api';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -21,6 +21,7 @@ const SelfGoalSteps: React.FC = () => {
   const [isThirdStepConfirmed, setIsThirdStepConfirmed] = useState(false);
   const [months, setMonths] = useState(24);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [packages, setPackages] = useState<any[]>([]);
 
   const pilgrimageTypes = [
     {
@@ -37,87 +38,11 @@ const SelfGoalSteps: React.FC = () => {
     }
   ];
 
-  const packages = [
-    {
-      id: 'premium',
-      name: 'Premium Package',
-      price: '700 550',
-      images: [
-        '/rut.png',
-        '/rut.png',
-        '/rut.png',
-        '/rut.png'
-
-      ],
-      details: {
-        duration: '6/8 ночей',
-        flight: 'Прямой рейс / air astana',
-        hotelMecca: {
-          name: 'Fairmont Makkah *5',
-          distance: 'До Каабы 100 м'
-        },
-        hotelMedina: {
-          name: 'Waqf Safi *4',
-          distance: 'До мечети Пророка 350м'
-        },
-        transfer: 'Высокоскоростной поезд',
-        food: 'Двухразовое (завтрак и ужин)',
-        additionalServices: 'Виза, услуги гида, экскурсия, фирменный хадж набор'
-      }
-    },
-    {
-      id: 'comfort',
-      name: 'Comfort Package',
-      price: '600 550',
-      images: [
-        '/rut.png',
-        '/rut.png',
-        '/rut.png',
-        '/rut.png'
-      ],
-      details: {
-        duration: '6/8 ночей',
-        flight: 'Прямой рейс / air astana',
-        hotelMecca: {
-          name: 'Swissotel Makkah *5',
-          distance: 'До Каабы 200 м'
-        },
-        hotelMedina: {
-          name: 'Pullman ZamZam *4',
-          distance: 'До мечети Пророка 500м'
-        },
-        transfer: 'Высокоскоростной поезд',
-        food: 'Двухразовое (завтрак и ужин)',
-        additionalServices: 'Виза, услуги гида, экскурсия, фирменный хадж набор'
-      }
-    },
-    {
-      id: 'standard',
-      name: 'Standard Package',
-      price: '400 550',
-      images: [
-        '/rut.png',
-        '/rut.png',
-        '/rut.png',
-        '/rut.png'
-      ],
-      details: {
-        duration: '6/8 ночей',
-        flight: 'Прямой рейс / air astana',
-        hotelMecca: {
-          name: 'Mövenpick Makkah *4',
-          distance: 'До Каабы 300 м'
-        },
-        hotelMedina: {
-          name: 'Novotel Madinah *4',
-          distance: 'До мечети Пророка 700м'
-        },
-        transfer: 'Высокоскоростной поезд',
-        food: 'Двухразовое (завтрак и ужин)',
-        additionalServices: 'Виза, услуги гида, экскурсия, фирменный хадж набор'
-      }
-    }
-  ];
+  useEffect(() => {
+    api.get('/packages')
+      .then(res => setPackages(Array.isArray(res.data) ? res.data : []))
+      .catch(() => setPackages([]));
+  }, []);
 
   // Автоматическое переключение слайдов
   useEffect(() => {
@@ -138,14 +63,15 @@ const SelfGoalSteps: React.FC = () => {
       const selectedPkg = packages.find(pkg => pkg.id === selectedPackage);
       if (!selectedPkg) return;
 
-      const targetAmount = parseInt(selectedPkg.price.replace(/\s/g, ''));
+      const targetAmount = selectedPkg.price;
       
-      await goalService.createSelfGoal({
+      await api.post('/goals/self', {
         type: selectedPilgrimage.toUpperCase() as 'UMRAH' | 'HAJJ',
-        packageType: selectedPackage.toUpperCase() as 'PREMIUM' | 'COMFORT' | 'STANDARD',
+        packageType: selectedPkg.type.toUpperCase() as 'PREMIUM' | 'COMFORT' | 'STANDARD',
         targetAmount,
         monthlyTarget: monthlyPayment,
-        currentAmount: 0
+        currentAmount: 0,
+        packageId: selectedPkg.id
       });
 
       // После успешного создания цели
@@ -212,7 +138,9 @@ const SelfGoalSteps: React.FC = () => {
     );
   };
 
-  const monthlyPayment = Math.ceil(parseInt(packages[0].price.replace(/\s/g, '')) / months);
+  const monthlyPayment = packages.length > 0
+    ? Math.ceil(packages[0].price / months)
+    : 0;
 
   const updateSliderBackground = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
@@ -259,7 +187,7 @@ const SelfGoalSteps: React.FC = () => {
               В стоимость включены перелет, отели, трансферы, сопровождение и всё необходимое.
             </div>
             <div className="goals__options" style={{ display: 'block' }}>
-              {packages.map((pkg) => (
+              {Array.isArray(packages) && packages.map((pkg) => (
                 <div
                   key={pkg.id}
                   className={`package-card ${selectedPackage === pkg.id ? 'selected' : ''}`}
@@ -267,7 +195,7 @@ const SelfGoalSteps: React.FC = () => {
                 >
                     <div className="package-header">
                       <div className="package-name">{pkg.name}</div>
-                      <div className="package-price">От {pkg.price} ₸</div>
+                      <div className="package-price">От {pkg.price || ''} ₸</div>
                     </div>
                   <div className="package-slider">
                     <Swiper
@@ -284,7 +212,7 @@ const SelfGoalSteps: React.FC = () => {
 
                       className="package-swiper"
                     >
-                      {pkg.images.map((image, index) => (
+                      {Array.isArray(pkg.images) && pkg.images.map((image: string, index: number) => (
                         <SwiperSlide key={index}>
                           <img
                             src={image}
@@ -300,33 +228,33 @@ const SelfGoalSteps: React.FC = () => {
                     <div className="package-details">
                       <div className="package-detail">
                         <span className="package-detail-label">Длительность тура</span>
-                        <span className="package-detail-value">{pkg.details.duration}</span>
+                        <span className="package-detail-value">{pkg.duration}</span>
                       </div>
                       <div className="package-detail">
                         <span className="package-detail-label">Рейс</span>
-                        <span className="package-detail-value">{pkg.details.flight}</span>
+                        <span className="package-detail-value">{pkg.flight}</span>
                       </div>
                       <div className="package-detail">
                         <span className="package-detail-label">Отель в Мекке</span>
                         <div>
-                          <div className="package-detail-value">{pkg.details.hotelMecca.name}</div>
-                          <div className="package-detail-subtext">{pkg.details.hotelMecca.distance}</div>
+                          <div className="package-detail-value">{pkg.hotelMeccaName}</div>
+                          <div className="package-detail-subtext">{pkg.hotelMeccaDistance}</div>
                         </div>
                       </div>
                       <div className="package-detail">
                         <span className="package-detail-label">Отель в Медине</span>
                         <div>
-                          <div className="package-detail-value">{pkg.details.hotelMedina.name}</div>
-                          <div className="package-detail-subtext">{pkg.details.hotelMedina.distance}</div>
+                          <div className="package-detail-value">{pkg.hotelMedinaName}</div>
+                          <div className="package-detail-subtext">{pkg.hotelMedinaDistance}</div>
                         </div>
                       </div>
                       <div className="package-detail">
                         <span className="package-detail-label">Трансфер</span>
-                        <span className="package-detail-value">{pkg.details.transfer}</span>
+                        <span className="package-detail-value">{pkg.transfer}</span>
                       </div>
                       <div className="package-detail">
                         <span className="package-detail-label">Питание</span>
-                        <span className="package-detail-value">{pkg.details.food}</span>
+                        <span className="package-detail-value">{pkg.food}</span>
                       </div>
                       <div className="package-detail">
                         <span className="package-detail-label package-detail-label--services">
@@ -397,7 +325,7 @@ const SelfGoalSteps: React.FC = () => {
                 </div>
                 <div className="verify-field">
                   <span className="verify-label">Стоимость</span>
-                  <span className="verify-value">{packages[0].price} ₸</span>
+                  <span className="verify-value">{packages[0]?.price || ''} ₸</span>
                 </div>
               </div>
               <div className="saving-period">

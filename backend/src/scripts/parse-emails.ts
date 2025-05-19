@@ -547,13 +547,13 @@ export async function parseEmails() {
 
         // Обновляем баланс пользователя только если это самостоятельное пополнение
         if (personData.payerIin === personData.recipientIin) {
-          await prisma.balance.upsert({
+          const balance = await prisma.balance.upsert({
             where: { userId: user.id },
             create: {
               userId: user.id,
               amount: amount,
               bonusAmount: 0,
-              hasFirstDeposit: true
+              hasFirstDeposit: false
             },
             update: {
               amount: {
@@ -561,6 +561,28 @@ export async function parseEmails() {
               }
             }
           });
+
+          // Проверяем, нужно ли начислить бонус (только один раз)
+          if (!balance.hasFirstDeposit) {
+            const completedTxCount = await prisma.transaction.count({
+              where: {
+                userId: user.id,
+                status: 'COMPLETED'
+              }
+            });
+            if (completedTxCount > 0) {
+              const BONUS_AMOUNT = 10000;
+              await prisma.balance.update({
+                where: { userId: user.id },
+                data: {
+                  amount: { increment: BONUS_AMOUNT },
+                  bonusAmount: { increment: BONUS_AMOUNT },
+                  hasFirstDeposit: true
+                }
+              });
+              console.log(`Бонус ${BONUS_AMOUNT} начислен пользователю с userId=${user.id}`);
+            }
+          }
         }
 
         // Если есть цель, обновляем её
@@ -588,6 +610,15 @@ export async function parseEmails() {
           await NotificationService.sendTransactionNotification(user.id.toString(), newTransaction.id);
         } catch (notifyError) {
           console.error('Ошибка при отправке уведомления:', notifyError);
+        }
+
+        // Обновляем ФИО, если оно отличается
+        if (personData.name && user.name !== personData.name) {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { name: personData.name }
+          });
+          console.log(`ФИО пользователя обновлено: ${user.name} → ${personData.name}`);
         }
 
         await processEmailData(personData);

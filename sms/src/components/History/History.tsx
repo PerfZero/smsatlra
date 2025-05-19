@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import HistoryItem from './HistoryItem';
-import { balanceService, Transaction } from '../../services/api';
+import { balanceService, Transaction, transformTransactions } from '../../services/api';
 import './History.css';
 
 // Группировка по дате
@@ -19,6 +19,7 @@ const formatDate = (dateStr: string) => {
 };
 
 const History: React.FC = () => {
+  const location = useLocation();
   const [search, setSearch] = useState('');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -29,45 +30,7 @@ const History: React.FC = () => {
       try {
         const data = await balanceService.getTransactions();
         // Преобразуем данные в нужный формат
-        const transformedData = data.map(item => {
-          // Определяем ИИН плательщика и получателя
-          let payerIin = item.iin;
-          let recipientIin = item.iin;
-          let payerName = item.name;
-
-          // Если это транзакция для родственника
-          if (item.goal?.relativeIin) {
-            recipientIin = item.goal.relativeIin;
-            // Убираем эту проверку, так как плательщик всегда текущий пользователь
-            // if (item.description?.includes('Пополнение от родственника:')) {
-            //   payerIin = item.goal.relativeIin;
-            //   payerName = item.goal.relativeName || '';
-            // }
-          }
-
-          return {
-            id: item.id.toString(),
-            iin: item.iin,
-            amount: item.amount,
-            type: item.type,
-            status: item.status,
-            description: item.description || '',
-            name: item.name || '',
-            date: item.date,
-            time: new Date().toLocaleTimeString('ru-RU'),
-            payerName,
-            payerIin,
-            paymentId: item.transactionNumber || '',
-            recipientIin,
-            phoneNumber: '',
-            goalId: item.goalId,
-            goal: item.goal,
-            bonus: item.bonus,
-            isFirstDeposit: item.isFirstDeposit,
-            transactionNumber: item.transactionNumber
-          };
-        });
-        
+        const transformedData = transformTransactions(data);
         setTransactions(transformedData);
       } catch (err) {
         setError('Не удалось загрузить историю транзакций');
@@ -80,9 +43,17 @@ const History: React.FC = () => {
     fetchTransactions();
   }, []);
 
-  const filtered = transactions.filter(item => 
-    item.iin.includes(search)
-  );
+  useEffect(() => {
+    // Если в query есть iin, подставляем его в поиск
+    const params = new URLSearchParams(location.search);
+    const iin = params.get('iin');
+    if (iin) setSearch(iin);
+  }, [location.search]);
+
+  const filtered = transactions.filter(item => {
+    if (!search) return true;
+    return item.recipientIin && item.recipientIin.includes(search);
+  });
   const grouped = groupByDate(filtered);
   const sortedDates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
 
@@ -107,7 +78,7 @@ const History: React.FC = () => {
           onChange={e => setSearch(e.target.value)}
         />
       </div>
-      <div className="history__list">
+      <div className="history__lists">
         {isLoading ? (
           <div className="history__loading">Загрузка...</div>
         ) : error ? (

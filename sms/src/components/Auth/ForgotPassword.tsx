@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { passwordResetService } from '../../services/api';
+import InputMask from 'react-input-mask';
 import './ForgotPassword.css';
 
 type RecoveryStep = 'initial' | 'verification' | 'password' | 'success';
@@ -10,6 +12,10 @@ interface FormErrors {
   verificationCode?: string;
   password?: string;
   confirmPassword?: string;
+}
+
+interface ApiError {
+  message: string;
 }
 
 const ForgotPassword: React.FC = () => {
@@ -23,6 +29,7 @@ const ForgotPassword: React.FC = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [timer, setTimer] = useState(60);
   const [canResend, setCanResend] = useState(false);
+  const [resetToken, setResetToken] = useState('');
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -36,11 +43,21 @@ const ForgotPassword: React.FC = () => {
     return () => clearInterval(interval);
   }, [timer, canResend]);
 
-  const handleResendCode = () => {
+  const handleResendCode = async () => {
     if (canResend) {
-      setTimer(60);
-      setCanResend(false);
-      // Here you would typically make an API call to resend the code
+      try {
+        const formattedPhone = phone.startsWith('8') ? '7' + phone.slice(1) : phone;
+        await passwordResetService.initiateReset(iin, formattedPhone);
+        setTimer(60);
+        setCanResend(false);
+        setErrors({});
+      } catch (error) {
+        const apiError = error as ApiError;
+        setErrors(prev => ({ 
+          ...prev, 
+          verificationCode: apiError.message || 'Произошла ошибка при отправке кода' 
+        }));
+      }
     }
   };
 
@@ -55,7 +72,8 @@ const ForgotPassword: React.FC = () => {
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\D/g, '');
     if (value.length <= 11) {
-      setPhone(value);
+      const formattedValue = value.startsWith('8') ? '7' + value.slice(1) : value;
+      setPhone(formattedValue);
       setErrors(prev => ({ ...prev, phone: undefined }));
     }
   };
@@ -92,13 +110,17 @@ const ForgotPassword: React.FC = () => {
   };
 
   const validatePhone = (value: string) => {
-    if (value.length !== 11) {
+    const cleanPhone = value.replace(/\D/g, '');
+    if (cleanPhone.length !== 11) {
       return 'Введите номер телефона полностью';
+    }
+    if (!cleanPhone.startsWith('7')) {
+      return 'Номер телефона должен начинаться с 7';
     }
     return undefined;
   };
 
-  const handleInitialSubmit = () => {
+  const handleInitialSubmit = async () => {
     const newErrors: FormErrors = {};
     const iinError = validateIin(iin);
     const phoneError = validatePhone(phone);
@@ -111,20 +133,47 @@ const ForgotPassword: React.FC = () => {
       return;
     }
 
-    setStep('verification');
+    try {
+      const formattedPhone = phone.startsWith('8') ? '7' + phone.slice(1) : phone;
+      await passwordResetService.initiateReset(iin, formattedPhone);
+      setStep('verification');
+      setTimer(60);
+      setCanResend(false);
+      setErrors({});
+    } catch (error) {
+      const apiError = error as ApiError;
+      setErrors(prev => ({ 
+        ...prev, 
+        phone: apiError.message || 'Произошла ошибка при отправке кода' 
+      }));
+    }
   };
 
-  const handleVerificationSubmit = () => {
+  const handleVerificationSubmit = async () => {
     const code = verificationCode.join('');
     if (code.length !== 4) {
       setErrors({ verificationCode: 'Введите код полностью' });
       return;
     }
-    // Here you would typically verify the code with your API
-    setStep('password');
+
+    try {
+      const response = await passwordResetService.verifyCode(iin, code);
+      setResetToken(response.resetToken);
+      setStep('password');
+      setErrors({});
+    } catch (error) {
+      const apiError = error as ApiError;
+      setErrors(prev => ({ 
+        ...prev, 
+        verificationCode: apiError.message || 'Неверный код подтверждения' 
+      }));
+      setVerificationCode(['', '', '', '']);
+      const firstInput = document.querySelector('input[name="code-0"]') as HTMLInputElement;
+      if (firstInput) firstInput.focus();
+    }
   };
 
-  const handlePasswordSubmit = () => {
+  const handlePasswordSubmit = async () => {
     const newErrors: FormErrors = {};
     
     if (password.length < 6) {
@@ -139,13 +188,28 @@ const ForgotPassword: React.FC = () => {
       return;
     }
 
-    // Here you would typically update the password with your API
-    setStep('success');
+    try {
+      await passwordResetService.resetPassword(iin, resetToken, password);
+      setStep('success');
+      setErrors({});
+    } catch (error) {
+      const apiError = error as ApiError;
+      setErrors(prev => ({ 
+        ...prev, 
+        password: apiError.message || 'Произошла ошибка при сбросе пароля' 
+      }));
+    }
   };
 
   const formatPhone = (phone: string) => {
     if (!phone) return '';
-    return `+7 (${phone.slice(1, 4)}) ${phone.slice(4, 7)}-${phone.slice(7, 9)}-${phone.slice(9, 11)}`;
+    const cleaned = phone.replace(/\D/g, '');
+    if (cleaned.length === 0) return '';
+    if (cleaned.length === 1) return cleaned;
+    if (cleaned.length <= 4) return `+${cleaned.slice(0, 1)} (${cleaned.slice(1)}`;
+    if (cleaned.length <= 7) return `+${cleaned.slice(0, 1)} (${cleaned.slice(1, 4)}) ${cleaned.slice(4)}`;
+    if (cleaned.length <= 9) return `+${cleaned.slice(0, 1)} (${cleaned.slice(1, 4)}) ${cleaned.slice(4, 7)}-${cleaned.slice(7)}`;
+    return `+${cleaned.slice(0, 1)} (${cleaned.slice(1, 4)}) ${cleaned.slice(4, 7)}-${cleaned.slice(7, 9)}-${cleaned.slice(9, 11)}`;
   };
 
   const formatIin = (iin: string) => {
@@ -156,39 +220,39 @@ const ForgotPassword: React.FC = () => {
   return (
     <div className="registration">
       <div className="registration__header">
-        <img src="images/logos.svg" alt="Atlas Save" className="registration__logo" />
+        <img src="/images/logos.svg" alt="Atlas Save" className="registration__logo" />
       </div>
 
       <div className="registration__content">
         {step === 'initial' && (
           <>
             <div className="dost_image login_dost_image">
-              <img src="images/dots.svg" alt="" />
+              <img src="/images/dots.svg" alt="" />
             </div>
             <h1 className="registration__title login_title">Восстановление <br /> аккаунта Atlas</h1>
             <div className="registration__form">
               <div className="registration__input-group">
-                <input
-                  type="tel"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  value={formatIin(iin)}
+                <InputMask
+                  mask="999999999999"
+                  value={iin}
                   onChange={handleIinChange}
                   placeholder="Введите свой ИИН"
                   className={errors.iin ? 'error' : ''}
-                />
+                >
+                  {(inputProps: any) => <input {...inputProps} type="text" />}
+                </InputMask>
                 {errors.iin && <div className="registration__error">{errors.iin}</div>}
               </div>
               <div className="registration__input-group">
-                <input
-                  type="tel"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
+                <InputMask
+                  mask="+7 (999) 999-99-99"
                   value={formatPhone(phone)}
                   onChange={handlePhoneChange}
                   placeholder="Введите свой номер телефона"
                   className={errors.phone ? 'error' : ''}
-                />
+                >
+                  {(inputProps: any) => <input {...inputProps} type="text" />}
+                </InputMask>
                 {errors.phone && <div className="registration__error">{errors.phone}</div>}
               </div>
               <div className="registration__login-link mn">
@@ -257,7 +321,7 @@ const ForgotPassword: React.FC = () => {
                 onClick={handleVerificationSubmit}
                 disabled={verificationCode.some(digit => !digit)}
               >
-                Перейти к восстановлению
+                Подтвердить код
               </button>
             </div>
           </>
@@ -301,7 +365,7 @@ const ForgotPassword: React.FC = () => {
         {step === 'success' && (
           <>
             <div className="dost_image greeen">
-              <img src="images/dots.svg" alt="" />
+              <img src="/images/dots.svg" alt="" />
             </div>
             <h1 className="registration__title sa">Ваш пароль успешно восстановлен!</h1>
             <div className="registration__success hs">

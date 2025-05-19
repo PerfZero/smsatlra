@@ -16,9 +16,9 @@ const Profile: React.FC = () => {
   };
 
   // Заглушка для имени пользователя, если оно не предоставлено
-  const userName = currentUser?.name || 'Нұралы Жеңісбекұлы'; 
-  const userPhoneNumber = currentUser?.phoneNumber || '+7 777 253 9319';
-  const userIin = currentUser?.iin || '980919300267';
+  const userName = currentUser?.name || 'Пользователь'; 
+  const userPhoneNumber = currentUser?.phoneNumber || '+7 777 777 7777';
+  const userIin = currentUser?.iin || '123456789012';
 
   return (
     <div className="profile">

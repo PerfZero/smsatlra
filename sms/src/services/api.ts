@@ -190,6 +190,7 @@ export interface Goal {
     iin: string;
   };
   createdAt: string;
+  packageId?: number;
 }
 
 export const goalService = {
@@ -204,24 +205,26 @@ export const goalService = {
     return response.data;
   },
 
-  createSelfGoal: async (data: { 
+  createSelfGoal: async (data: {
     type: 'UMRAH' | 'HAJJ',
     packageType: 'PREMIUM' | 'COMFORT' | 'STANDARD',
     targetAmount: number,
     monthlyTarget: number,
-    currentAmount: number
+    currentAmount: number,
+    packageId: number
   }): Promise<Goal> => {
     const response = await api.post<Goal>('/goals/self', data);
     return response.data;
   },
 
-  createFamilyGoal: async (data: { 
+  createFamilyGoal: async (data: {
     fullName: string,
     iin: string,
     type: 'UMRAH' | 'HAJJ',
     packageType: 'PREMIUM' | 'COMFORT' | 'STANDARD',
     targetAmount: number,
-    monthlyTarget: number 
+    monthlyTarget: number,
+    packageId: number
   }): Promise<Goal> => {
     try {
       console.log('Отправка запроса на создание цели для родственника:', data);
@@ -335,5 +338,101 @@ export const verificationService = {
     return response.json();
   },
 };
+
+export const passwordResetService = {
+  async initiateReset(iin: string, phone: string): Promise<{ success: boolean; message: string }> {
+    const response = await fetch(`${API_URL}/auth/forgot-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ iin, phone }),
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Ошибка при отправке кода');
+    }
+    
+    return response.json();
+  },
+
+  async verifyCode(iin: string, code: string): Promise<{ success: boolean; resetToken: string }> {
+    const response = await fetch(`${API_URL}/auth/verify-reset-code`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ iin, code }),
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Ошибка при проверке кода');
+    }
+    
+    return response.json();
+  },
+
+  async resetPassword(iin: string, resetToken: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+    const response = await fetch(`${API_URL}/auth/reset-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ iin, resetToken, newPassword }),
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Ошибка при сбросе пароля');
+    }
+    
+    return response.json();
+  }
+};
+
+// Универсальная функция преобразования TransactionResponse -> Transaction
+export function transformTransaction(item: any): Transaction {
+  let payerIin = item.iin;
+  let recipientIin = item.iin;
+  let payerName = item.name;
+
+  // Если это транзакция для родственника
+  if (item.goal?.relativeIin) {
+    recipientIin = item.goal.relativeIin;
+    // Плательщик всегда текущий пользователь
+    // if (item.description?.includes('Пополнение от родственника:')) {
+    //   payerIin = item.goal.relativeIin;
+    //   payerName = item.goal.relativeName || '';
+    // }
+  }
+
+  return {
+    id: item.id.toString(),
+    iin: item.iin,
+    amount: item.amount,
+    type: item.type,
+    status: item.status,
+    description: item.description || '',
+    name: item.name || '',
+    date: item.date,
+    time: new Date().toLocaleTimeString('ru-RU'),
+    payerName,
+    payerIin,
+    paymentId: item.transactionNumber || '',
+    recipientIin,
+    phoneNumber: '',
+    goalId: item.goalId,
+    goal: item.goal,
+    bonus: item.bonus,
+    isFirstDeposit: item.isFirstDeposit,
+    transactionNumber: item.transactionNumber
+  };
+}
+
+export function transformTransactions(items: any[]): Transaction[] {
+  return items.map(transformTransaction);
+}
 
 export default api; 

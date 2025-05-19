@@ -14,6 +14,8 @@ import balanceRoutes from './routes/balance.routes';
 import goalRoutes from './routes/goal.routes';
 import notificationRoutes from './routes/notification.routes';
 import verificationRoutes from './routes/verification.routes';
+import packageRoutes from './routes/package.routes';
+import uploadRoutes from './routes/upload.routes';
 
 dotenv.config();
 
@@ -37,6 +39,9 @@ app.use('/api/balance', balanceRoutes);
 app.use('/api/goals', goalRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/verification', verificationRoutes);
+app.use('/api/packages', packageRoutes);
+app.use('/api/upload', uploadRoutes);
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

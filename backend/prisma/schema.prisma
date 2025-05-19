@@ -18,6 +18,10 @@ model User {
   goals       Goal[]
   transactions Transaction[]
   relatives   Relative[]
+  resetCode   String?     // Код для восстановления пароля
+  resetCodeExpires DateTime? // Срок действия кода
+  resetToken  String?     // Токен для сброса пароля
+  resetTokenExpires DateTime? // Срок действия токена
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 }
@@ -28,7 +32,7 @@ model Balance {
   bonusAmount Float  @default(0)
   hasFirstDeposit Boolean @default(false)
   userId    Int      @unique
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -39,13 +43,15 @@ model Goal {
   relativeId    Int?     // null если цель для себя
   type          String   // 'UMRAH' или 'HAJJ'
   packageType   String   // 'PREMIUM', 'COMFORT', 'STANDARD'
+  packageId     Int?     // ID выбранного пакета
+  package       TourPackage? @relation(fields: [packageId], references: [id])
   targetAmount  Float
   currentAmount Float    @default(0)
   monthlyTarget Float    // Целевая сумма ежемесячного взноса
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  user          User     @relation(fields: [userId], references: [id])
-  relative      Relative? @relation(fields: [relativeId], references: [id])
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  relative      Relative? @relation(fields: [relativeId], references: [id], onDelete: Cascade)
   transactions  Transaction[]
 }
 
@@ -56,7 +62,7 @@ model Relative {
   iin       String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   goals     Goal[]
   transactions Transaction[]
 }
@@ -70,9 +76,9 @@ model Transaction {
   userId      Int
   goalId      Int?     // ID цели, если транзакция связана с конкретной целью
   relativeId  Int?     // ID родственника, если транзакция связана с родственником
-  user        User      @relation(fields: [userId], references: [id])
-  goal        Goal?     @relation(fields: [goalId], references: [id])
-  relative    Relative? @relation(fields: [relativeId], references: [id])
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goal        Goal?     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  relative    Relative? @relation(fields: [relativeId], references: [id], onDelete: Cascade)
   description String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -92,4 +98,25 @@ enum TransactionStatus {
 enum Role {
   USER
   ADMIN
+}
+
+model TourPackage {
+  id                  Int      @id @default(autoincrement())
+  name                String
+  price               Float
+  description         String
+  type                String   // 'Hajj' или 'Umrah'
+  images              String[] // массив ссылок на картинки
+  duration            String
+  flight              String
+  hotelMeccaName      String
+  hotelMeccaDistance  String
+  hotelMedinaName     String
+  hotelMedinaDistance String
+  transfer            String
+  food                String
+  additionalServices  String
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  goals               Goal[]   // обратная связь с целями
 } 

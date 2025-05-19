@@ -1,12 +1,17 @@
-import express from 'express';
+import { Router } from 'express';
 import { authController } from '../controllers/auth.controller';
-import { authMiddleware } from '../middleware/auth';
+import { authMiddleware } from '../middleware/auth.middleware';
 
-const router = express.Router();
+const router = Router();
 
 // Публичные роуты
 router.post('/register', authController.register);
 router.post('/login', authController.login);
+
+// Восстановление пароля
+router.post('/forgot-password', authController.initiatePasswordReset);
+router.post('/verify-reset-code', authController.verifyResetCode);
+router.post('/reset-password', authController.resetPassword);
 
 // Защищенные роуты
 router.use(authMiddleware);
