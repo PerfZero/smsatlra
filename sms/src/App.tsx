@@ -17,6 +17,7 @@ import FamilyGoalSteps from './components/Goals/FamilyGoalSteps';
 import History from './components/History/History';
 import GoalDetail from './components/Goals/GoalDetail';
 import FAQ from './components/FAQ/FAQ';
+import FAQPage from './components/Goals/FAQPage';
 
 import Toolbar from './components/Toolbar/Toolbar';
 import Goals from './components/Goals/Goals';
@@ -24,6 +25,7 @@ import './styles/base/_reset.css';
 import { useAuthInit } from './hooks/useAuthInit';
 import Footer from './components/Footer/Footer';
 import Contacts from './components/Contacts/Contacts';
+import AdminPanel from './components/AdminPanel';
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ element: React.ReactElement }> = ({ element }) => {
@@ -126,7 +128,7 @@ const AppRoutes: React.FC = () => {
         path="/faq"
         element={
           <Layout>
-            <ProtectedRoute element={<FAQ />} />
+            <ProtectedRoute element={<FAQPage />} />
           </Layout>
         }
       />
@@ -135,6 +137,14 @@ const AppRoutes: React.FC = () => {
         element={
           <Layout>
             <ProtectedRoute element={<Contacts />} />
+          </Layout>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <Layout>
+            <ProtectedRoute element={<AdminPanelWrapper />} />
           </Layout>
         }
       />
@@ -152,6 +162,15 @@ const AppWrapper = () => {
       </Router>
     </Provider>
   );
+};
+
+// Обертка для проверки роли
+const AdminPanelWrapper: React.FC = () => {
+  const user = useSelector((state: RootState) => state.user.currentUser);
+  if (!user || user.role !== 'ADMIN') {
+    return <Navigate to="/" replace />;
+  }
+  return <AdminPanel />;
 };
 
 export default AppWrapper;

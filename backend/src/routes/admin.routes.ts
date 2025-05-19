@@ -31,6 +31,12 @@ router.put('/users/:id/role', adminMiddleware, adminController.updateUserRole);
 // Удаление пользователя
 router.delete('/users/:id', adminMiddleware, adminController.deleteUser);
 
+// Назначение пользователя админом
+router.post('/users/:id/make-admin', adminMiddleware, adminController.makeAdmin);
+
+// Назначение пользователя пользователем
+router.post('/users/:id/make-user', adminMiddleware, adminController.makeUser);
+
 // Парсинг email и сохранение данных
 router.post('/parse-email', adminMiddleware, parserController.parseEmail);
 
@@ -199,5 +205,8 @@ router.get('/email-monitor', adminMiddleware, (req, res) => {
     </html>
   `);
 });
+
+// Получить подробную информацию о пользователе (баланс, цели, история)
+router.get('/users/:id/details', adminMiddleware, adminController.getUserDetails);
 
 export default router; 

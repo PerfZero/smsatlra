@@ -611,14 +611,6 @@ color: rgba(34, 34, 34, 0.7);
   background: white;
 }
 
-.package-detail--services {
-  margin-top: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-top: 1px solid #f0f0f0;
-  padding-top: 12px;
-}
 
 
 
@@ -720,6 +712,13 @@ background: #fff;
   color: #999;
 }
 
+.card-gols{
+  width: 100% !important;
+  max-width: 100% !important; 
+  background:none;
+  padding: 0;
+}
+
 @media screen and (min-width: 768px) {
   .wrapper{
     border-radius: 64px;
@@ -737,6 +736,7 @@ background: #fff;
     border-top: none  ;
 
   }
+  
 
   .goals__content{
     max-width: 650px;

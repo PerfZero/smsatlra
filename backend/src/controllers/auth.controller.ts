@@ -2,6 +2,10 @@ import { Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
+import { SmsService } from '../services/sms.service';
+
+const smsService = new SmsService();
 
 export const authController = {
   async register(req: Request, res: Response) {
@@ -201,6 +205,176 @@ export const authController = {
     } catch (error) {
       console.error('Update profile error:', error);
       res.status(500).json({ error: 'Ошибка при обновлении профиля' });
+    }
+  },
+
+  async initiatePasswordReset(req: Request, res: Response) {
+    try {
+      console.log('=== Password Reset Initiation Start ===');
+      console.log('Request body:', { iin: req.body.iin, phone: req.body.phone });
+      
+      const { iin, phone } = req.body;
+
+      const user = await prisma.user.findFirst({
+        where: {
+          AND: [
+            { iin },
+            { phone }
+          ]
+        }
+      });
+
+      if (!user) {
+        return res.status(404).json({ 
+          success: false, 
+          message: 'Пользователь не найден' 
+        });
+      }
+
+      // Генерируем код верификации (4 цифры)
+      const verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
+      
+      // Сохраняем код в базе данных
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          resetCode: verificationCode,
+          resetCodeExpires: new Date(Date.now() + 5 * 60 * 1000) // 5 минут
+        }
+      });
+
+      // Отправляем SMS с кодом
+      const message = `${verificationCode} - код для восстановления пароля Atlas Save`;
+      const smsSent = await smsService.sendSms(phone, message);
+
+      if (!smsSent) {
+        return res.status(500).json({ 
+          success: false, 
+          message: 'Ошибка при отправке SMS' 
+        });
+      }
+
+      res.json({ 
+        success: true, 
+        message: 'Код верификации отправлен' 
+      });
+    } catch (error) {
+      console.error('Error in initiatePasswordReset:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Внутренняя ошибка сервера' 
+      });
+    }
+  },
+
+  async verifyResetCode(req: Request, res: Response) {
+    try {
+      console.log('=== Verify Reset Code Start ===');
+      console.log('Request body:', { iin: req.body.iin, code: req.body.code });
+      
+      const { iin, code } = req.body;
+
+      const user = await prisma.user.findUnique({
+        where: { iin }
+      });
+
+      if (!user) {
+        return res.status(404).json({ 
+          success: false, 
+          message: 'Пользователь не найден' 
+        });
+      }
+
+      if (!user.resetCode || !user.resetCodeExpires || user.resetCodeExpires < new Date()) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Код верификации истек' 
+        });
+      }
+
+      if (user.resetCode !== code) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Неверный код верификации' 
+        });
+      }
+
+      // Генерируем временный токен для сброса пароля
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          resetToken,
+          resetTokenExpires: new Date(Date.now() + 5 * 60 * 1000), // 5 минут
+          resetCode: null,
+          resetCodeExpires: null
+        }
+      });
+
+      res.json({ 
+        success: true, 
+        resetToken 
+      });
+    } catch (error) {
+      console.error('Error in verifyResetCode:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Внутренняя ошибка сервера' 
+      });
+    }
+  },
+
+  async resetPassword(req: Request, res: Response) {
+    try {
+      console.log('=== Reset Password Start ===');
+      console.log('Request body:', { iin: req.body.iin });
+      
+      const { iin, resetToken, newPassword } = req.body;
+
+      const user = await prisma.user.findUnique({
+        where: { iin }
+      });
+
+      if (!user) {
+        return res.status(404).json({ 
+          success: false, 
+          message: 'Пользователь не найден' 
+        });
+      }
+
+      if (!user.resetToken || !user.resetTokenExpires || 
+          user.resetTokenExpires < new Date() || 
+          user.resetToken !== resetToken) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Недействительный токен сброса пароля' 
+        });
+      }
+
+      // Хешируем новый пароль
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      // Обновляем пароль пользователя
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { 
+          password: hashedPassword,
+          resetToken: null,
+          resetTokenExpires: null
+        }
+      });
+
+      res.json({ 
+        success: true, 
+        message: 'Пароль успешно обновлен' 
+      });
+    } catch (error) {
+      console.error('Error in resetPassword:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Внутренняя ошибка сервера' 
+      });
     }
   }
 }; 

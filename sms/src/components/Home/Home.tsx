@@ -6,6 +6,7 @@ import { SemiCircleProgress } from 'react-semicircle-progressbar';
 import { RelativesList } from '../Relatives/RelativesList';
 import LinearProgress from '../LinearProgress/LinearProgress';
 import DepositModal from '../DepositModal/DepositModal';
+import { cardColors } from '../../utils/goalColors';
 import './Home.css';
 // Assuming you have a progress bar component or will create one
 // import ProgressBar from '../ProgressBar/ProgressBar'; 
@@ -52,11 +53,6 @@ const Home: React.FC = () => {
   const [selectedGoalId, setSelectedGoalId] = useState<number | null>(null);
   const [lastTransaction, setLastTransaction] = useState<Transaction | null>(null);
   const [openFaqItem, setOpenFaqItem] = useState<number | null>(null);
-
-  const cardColors = [
-    '#FF3B30', '#FF9500', '#FFCC00', '#00C7BE', '#30B0C7',
-    '#32ADE6', '#007AFF', '#5856D6', '#AF52DE', '#FF2D55', '#A2845E'
-  ];
 
   const fetchData = async () => {
     try {
@@ -132,7 +128,9 @@ const Home: React.FC = () => {
   const dollarAmount = (currentBalance / 450).toFixed(2); // Примерный курс тенге к доллару
 
   // Вычисляем прогресс и оставшуюся сумму
-  const progressPercentage = goal ? (goal.currentAmount / goal.targetAmount) * 100 : 0;
+  const progressPercentage = goal && goal.targetAmount > 0
+    ? Math.min(100, Math.max(0, (goal.currentAmount / goal.targetAmount) * 100))
+    : 0;
   const remainingAmount = goal ? goal.targetAmount - goal.currentAmount : 0;
 
   const handleDepositClick = (goalId?: number) => {
@@ -169,8 +167,8 @@ const Home: React.FC = () => {
       </div>
       
       <div className="home__content">
-        {currentBalance > 0 ? (
-          // --- Блок когда есть баланс (как на скрине) ---
+        {goal ? (
+          // --- Блок когда есть цель ---
           <div className="home__balance-section home__balance-section--active">
              <div className="home__greeting">
                Ассаляму Алейкум, <br />
@@ -256,24 +254,6 @@ const Home: React.FC = () => {
                      {showBalance ? `≈ $${dollarAmount}` : '≈ $* * * *'}
                    </div>
 
-                   {balance && balance.amount > 0 && !goal && (
-                     <div className="home__goal-wrapper">
-                       <div className="home__goal-prompt">
-                        <img className="home__goal-prompt-icon" src="/znak.svg" alt="" />
-                         <div className="home__goal-prompt-text">
-                           Вы начали копить деньги, но не выбрали цель - Умра или Хадж.
-                           <br /><br />
-                           <span className="home__goal-prompt-text-small">Укажите цель — Вы будете знать, сколько нужно накопить, свой прогресс и в нужный момент получите напоминание, чтобы не упустить важные шаги.</span>
-                         </div>
-                       </div>
-                       <div className="home__goal-prompt-button">
-                         <button className="home__button home__button--primary" onClick={() => window.location.href = '/self-goal-steps'}>
-                           Указать цель накопления
-                         </button>
-                       </div>
-                     </div>
-                   )}
-
                    {goal && (
                      <>
                        <div className="home__goal-section">
@@ -284,13 +264,13 @@ const Home: React.FC = () => {
                            {goal.packageType && (
                              <>
                                <span className="home__goal-separator">|</span>
-                               <span className="home__goal-package">{goal.packageType.charAt(0).toUpperCase() + goal.packageType.slice(1)} Package</span>
+                               <span className="home__goal-package">{goal.packageType.charAt(0).toUpperCase() + goal.packageType.slice(1)}</span>
                              </>
                            )}
                            <Link to={`/goal/${goal.id}`} className="home__relative-navigate">
                             <span>Подробнее</span>
                             <svg width="7" height="11" viewBox="0 0 7 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M1 1L5.83482 5.35134C5.9231 5.43079 5.9231 5.56921 5.83482 5.64866L1 10" stroke="white" stroke-linecap="round" />
+  <path d="M1 1L5.83482 5.35134C5.9231 5.43079 5.9231 5.56921 5.83482 5.64866L1 10" stroke="white" strokeLinecap="round" />
 </svg>
                            </Link>
                          </div>
@@ -343,36 +323,92 @@ const Home: React.FC = () => {
              </a>
           </div>
         ) : (
-          // --- Блок когда баланс пустой ---
-          <div className="home__balance-section">
-            <h2 className="home__title">Ваш баланс пока пустой.</h2>
-            <p className="home__subtitle">Начните копить деньги на Умру или Хадж уже сегодня!</p>
-            
-            <div className="home__balance-card">
-              {/* Содержимое карточки для пустого баланса остается как было, */}
-              {/* или можно упростить, если нужно */}
-               <div className="home__balance-header">
-                 <span>Текущий баланс</span>
-                 {/* Кнопка скрытия тут не нужна, если баланс 0 */}
-               </div>
-               <div className="home__balance-amount">
-                 0 <span className="home__balance-dollar">₸</span>
-               </div>
-               <div className="home__balance-dollar-amount">
-                 ~ $0
-               </div>
+          balance && balance.amount > 0 ? (
+            // --- Блок когда есть деньги, но нет цели ---
+            <div className="home__balance-section home__balance-section--active">
+              <div className="home__greeting">
+                Ассаляму Алейкум, <br />
+                <strong>{currentUser?.name || 'Пользователь'}!</strong>
+              </div>
+              <div className="home__balance-card home__balance-card--active">
+                <div className="home__balance-label-container">
+                  <span className="home__balance-label--active">Ваш баланс</span>
+                  <button className="home__balance-toggle" onClick={toggleBalance}>
+                    <img src={showBalance ? "/images/eye-open.svg" : "/images/eye-closed.svg"} alt="Toggle balance visibility" />
+                  </button>
+                </div>
+                <div className="home__balance-amount">
+                  {showBalance ? (
+                    <>
+                      <span className="home__balance-currency">₸</span> {currentBalance.toLocaleString()}
+                    </>
+                  ) : (
+                    '* * * * *'
+                  )}
+                  <div className="home__bonus-amount">
+                    {showBalance ? (
+                      <>{currentBonus.toLocaleString()} Б</>
+                    ) : (
+                      '* * * * *'
+                    )}
+                  </div>
+                </div>
+                <div className="home__balance-dollar-amount">
+                  {showBalance ? `≈ $${dollarAmount}` : '≈ $* * * *'}
+                </div>
+                <div className="home__goal-wrapper">
+                  <div className="home__goal-prompt">
+                    <img className="home__goal-prompt-icon" src="/znak.svg" alt="" />
+                    <div className="home__goal-prompt-text">
+                      Вы начали копить деньги, но не выбрали цель - Умра или Хадж.
+                      <br /><br />
+                      <span className="home__goal-prompt-text-small">Укажите цель — Вы будете знать, сколько нужно накопить, свой прогресс и в нужный момент получите напоминание, чтобы не упустить важные шаги.</span>
+                    </div>
+                  </div>
+                  <div className="home__goal-prompt-button">
+                    <button className="home__button home__button--primary" onClick={() => window.location.href = '/self-goal-steps'}>
+                      Указать цель накопления
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <a
+                href="https://kaspi.kz/pay/_gate?action=service_with_subservice&service_id=3468&subservice_id=22892&region_id=18"
+                className="home__button home__button--primary red"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Пополнить счет
+                <img src="/images/kaspy.svg" alt="Add" />
+              </a>
             </div>
-            
-            <a
-              href="https://kaspi.kz/pay/_gate?action=service_with_subservice&service_id=3468&subservice_id=22892&region_id=18"
-              className="home__button home__button--primary red"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Пополнить счет
-              <img src="/images/kaspy.svg" alt="Add" />
-            </a>
-          </div>
+          ) : (
+            // --- Блок когда баланс пустой и нет цели ---
+            <div className="home__balance-section">
+              <h2 className="home__title">Ваш баланс пока пустой.</h2>
+              <p className="home__subtitle">Начните копить деньги на Умру или Хадж уже сегодня!</p>
+              <div className="home__balance-card">
+                <div className="home__balance-header">
+                  <span>Текущий баланс</span>
+                </div>
+                <div className="home__balance-amount">
+                  0 <span className="home__balance-dollar">₸</span>
+                </div>
+                <div className="home__balance-dollar-amount">
+                  ~ $0
+                </div>
+              </div>
+              <a
+                href="https://kaspi.kz/pay/_gate?action=service_with_subservice&service_id=3468&subservice_id=22892&region_id=18"
+                className="home__button home__button--primary red"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Пополнить счет
+                <img src="/images/kaspy.svg" alt="Add" />
+              </a>
+            </div>
+          )
         )}
 
         {/* --- Раздел "Мои близкие" --- */}
@@ -396,10 +432,10 @@ const Home: React.FC = () => {
                       <span className="home__relative-separator">|</span>
                       {familyGoal.relative?.fullName}, на {familyGoal.type === 'UMRAH' ? 'Умру' : 'Хадж'}
                       
-                      <Link to={`/goal/${familyGoal.id}`} className="home__relative-navigate">
+                      <Link to={`/goal/${familyGoal.id}?colorIndex=${index}`} className="home__relative-navigate">
                         <span>Перейти</span>
                         <svg width="7" height="11" viewBox="0 0 7 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M1 1L5.83482 5.35134C5.9231 5.43079 5.9231 5.56921 5.83482 5.64866L1 10" stroke="white" stroke-linecap="round" />
+  <path d="M1 1L5.83482 5.35134C5.9231 5.43079 5.9231 5.56921 5.83482 5.64866L1 10" stroke="white" strokeLinecap="round" />
 </svg>
                       </Link>
                     </div>

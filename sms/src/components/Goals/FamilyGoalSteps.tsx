@@ -10,6 +10,7 @@ import './Goals.css';
 import { ReactComponent as UmrahIcon } from './icons/umrah_1.svg';
 import { ReactComponent as HajjIcon } from './icons/hajj_1.svg';
 import { ReactComponent as CheckIcon } from './icons/check.svg';
+import api from '../../services/api';
 
 const FamilyGoalSteps: React.FC = () => {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ const FamilyGoalSteps: React.FC = () => {
     confirmIin: ''
   });
   const [isRelativeDataValid, setIsRelativeDataValid] = useState(false);
+  const [packages, setPackages] = useState<any[]>([]);
 
   const pilgrimageTypes = [
     {
@@ -43,87 +45,11 @@ const FamilyGoalSteps: React.FC = () => {
     }
   ];
 
-  const packages = [
-    {
-      id: 'premium',
-      name: 'Premium Package',
-      price: '700 550',
-      images: [
-        '/rut.png',
-        '/rut.png',
-        '/rut.png',
-        '/rut.png'
-
-      ],
-      details: {
-        duration: '6/8 ночей',
-        flight: 'Прямой рейс / air astana',
-        hotelMecca: {
-          name: 'Fairmont Makkah *5',
-          distance: 'До Каабы 100 м'
-        },
-        hotelMedina: {
-          name: 'Waqf Safi *4',
-          distance: 'До мечети Пророка 350м'
-        },
-        transfer: 'Высокоскоростной поезд',
-        food: 'Двухразовое (завтрак и ужин)',
-        additionalServices: 'Виза, услуги гида, экскурсия, фирменный хадж набор'
-      }
-    },
-    {
-      id: 'comfort',
-      name: 'Comfort Package',
-      price: '600 550',
-      images: [
-        '/rut.png',
-        '/rut.png',
-        '/rut.png',
-        '/rut.png'
-      ],
-      details: {
-        duration: '6/8 ночей',
-        flight: 'Прямой рейс / air astana',
-        hotelMecca: {
-          name: 'Swissotel Makkah *5',
-          distance: 'До Каабы 200 м'
-        },
-        hotelMedina: {
-          name: 'Pullman ZamZam *4',
-          distance: 'До мечети Пророка 500м'
-        },
-        transfer: 'Высокоскоростной поезд',
-        food: 'Двухразовое (завтрак и ужин)',
-        additionalServices: 'Виза, услуги гида, экскурсия, фирменный хадж набор'
-      }
-    },
-    {
-      id: 'standard',
-      name: 'Standard Package',
-      price: '400 550',
-      images: [
-        '/rut.png',
-        '/rut.png',
-        '/rut.png',
-        '/rut.png'
-      ],
-      details: {
-        duration: '6/8 ночей',
-        flight: 'Прямой рейс / air astana',
-        hotelMecca: {
-          name: 'Mövenpick Makkah *4',
-          distance: 'До Каабы 300 м'
-        },
-        hotelMedina: {
-          name: 'Novotel Madinah *4',
-          distance: 'До мечети Пророка 700м'
-        },
-        transfer: 'Высокоскоростной поезд',
-        food: 'Двухразовое (завтрак и ужин)',
-        additionalServices: 'Виза, услуги гида, экскурсия, фирменный хадж набор'
-      }
-    }
-  ];
+  useEffect(() => {
+    api.get('/packages')
+      .then(res => setPackages(Array.isArray(res.data) ? res.data : []))
+      .catch(() => setPackages([]));
+  }, []);
 
   // Автоматическое переключение слайдов
   useEffect(() => {
@@ -214,7 +140,8 @@ const FamilyGoalSteps: React.FC = () => {
     );
   };
 
-  const monthlyPayment = Math.ceil(parseInt(packages[0].price.replace(/\s/g, '')) / months);
+  // Найти выбранный пакет
+  const selectedPkg = Array.isArray(packages) ? packages.find(p => p.id === selectedPackage) : undefined;
 
   const updateSliderBackground = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
@@ -237,24 +164,25 @@ const FamilyGoalSteps: React.FC = () => {
         return;
       }
 
-      const targetAmount = parseFloat(selectedPackageData.price.replace(/\s/g, ''));
+      const targetAmount = selectedPackageData.price;
       
       console.log('Отправляем данные:', {
         fullName: relativeData.fullName,
         iin: relativeData.iin,
         type: selectedPilgrimage.toUpperCase(),
-        packageType: selectedPackage.toUpperCase(),
+        packageType: selectedPackageData.name,
         targetAmount,
-        monthlyTarget: monthlyPayment
+        monthlyTarget: selectedPkg ? Math.ceil(selectedPkg.price / months) : 0
       });
 
       await goalService.createFamilyGoal({
         fullName: relativeData.fullName,
         iin: relativeData.iin,
         type: selectedPilgrimage.toUpperCase() as 'UMRAH' | 'HAJJ',
-        packageType: selectedPackage.toUpperCase() as 'PREMIUM' | 'COMFORT' | 'STANDARD',
+        packageType: selectedPackageData.name,
         targetAmount,
-        monthlyTarget: monthlyPayment
+        monthlyTarget: selectedPkg ? Math.ceil(selectedPkg.price / months) : 0,
+        packageId: Number(selectedPackageData.id)
       });
 
       if (withDeposit) {
@@ -352,7 +280,7 @@ const FamilyGoalSteps: React.FC = () => {
               В стоимость включены перелет, отели, трансферы, сопровождение и всё необходимое.
             </div>
             <div className="goals__options" style={{ display: 'block' }}>
-              {packages.map((pkg) => (
+              {Array.isArray(packages) && packages.map((pkg) => (
                 <div
                   key={pkg.id}
                   className={`package-card ${selectedPackage === pkg.id ? 'selected' : ''}`}
@@ -371,7 +299,7 @@ const FamilyGoalSteps: React.FC = () => {
 
                       className="package-swiper"
                     >
-                      {pkg.images.map((image, index) => (
+                      {pkg.images.map((image: string, index: number) => (
                         <SwiperSlide key={index}>
                           <img
                             src={image}
@@ -387,33 +315,33 @@ const FamilyGoalSteps: React.FC = () => {
                     <div className="package-details">
                       <div className="package-detail">
                         <span className="package-detail-label">Длительность тура</span>
-                        <span className="package-detail-value">{pkg.details.duration}</span>
+                        <span className="package-detail-value">{pkg.duration}</span>
                       </div>
                       <div className="package-detail">
                         <span className="package-detail-label">Рейс</span>
-                        <span className="package-detail-value">{pkg.details.flight}</span>
+                        <span className="package-detail-value">{pkg.flight}</span>
                       </div>
                       <div className="package-detail">
                         <span className="package-detail-label">Отель в Мекке</span>
                         <div>
-                          <div className="package-detail-value">{pkg.details.hotelMecca.name}</div>
-                          <div className="package-detail-subtext">{pkg.details.hotelMecca.distance}</div>
+                          <div className="package-detail-value">{pkg.hotelMeccaName}</div>
+                          <div className="package-detail-subtext">{pkg.hotelMeccaDistance}</div>
                         </div>
                       </div>
                       <div className="package-detail">
                         <span className="package-detail-label">Отель в Медине</span>
                         <div>
-                          <div className="package-detail-value">{pkg.details.hotelMedina.name}</div>
-                          <div className="package-detail-subtext">{pkg.details.hotelMedina.distance}</div>
+                          <div className="package-detail-value">{pkg.hotelMedinaName}</div>
+                          <div className="package-detail-subtext">{pkg.hotelMedinaDistance}</div>
                         </div>
                       </div>
                       <div className="package-detail">
                         <span className="package-detail-label">Трансфер</span>
-                        <span className="package-detail-value">{pkg.details.transfer}</span>
+                        <span className="package-detail-value">{pkg.transfer}</span>
                       </div>
                       <div className="package-detail">
                         <span className="package-detail-label">Питание</span>
-                        <span className="package-detail-value">{pkg.details.food}</span>
+                        <span className="package-detail-value">{pkg.food}</span>
                       </div>
                       <div className="package-detail">
                         <span className="package-detail-label package-detail-label--services">
@@ -481,14 +409,12 @@ const FamilyGoalSteps: React.FC = () => {
                 <div className="verify-field">
                   <span className="verify-label">Турпакет</span>
                   <span className="verify-value green">{
-                    packages.find(p => p.id === selectedPackage)?.name || ''
+                    Array.isArray(packages) && packages.find(p => p.id === selectedPackage)?.name || ''
                   }</span>
                 </div>
                 <div className="verify-field">
                   <span className="verify-label">Стоимость</span>
-                  <span className="verify-value">{
-                    packages.find(p => p.id === selectedPackage)?.price || ''
-                  } ₸</span>
+                  <span className="verify-value">{selectedPkg?.price || ''} ₸</span>
                 </div>
               </div>
               <div className="saving-period">
@@ -508,7 +434,7 @@ const FamilyGoalSteps: React.FC = () => {
 
               <div className="monthly-payment">
                 <p>Чтобы накопить за {months} месяца, Вам нужно вносить:</p>
-                <h2>{monthlyPayment.toLocaleString()} ₸ в месяц</h2>
+                <h2>{selectedPkg ? Math.ceil(selectedPkg.price / months).toLocaleString() : ''} ₸ в месяц</h2>
                 <p className="payment-note">
                   Сумма рассчитана без применения общей системы. Главное — исправное накопление. Чистота и сумма пополнений — на Ваше усмотрение.
                 </p>

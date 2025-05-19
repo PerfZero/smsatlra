@@ -1,0 +1,303 @@
+.admin-packages {
+  background: #fafcff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 32px 24px;
+  margin: 0 auto;
+  max-width: 800px;
+}
+
+.admin-packages h2 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.admin-packages form {
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+}
+
+.admin-packages input,
+.admin-packages textarea,
+.admin-packages select {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 16px;
+  margin-bottom: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border 0.2s;
+}
+
+.admin-packages input:focus,
+.admin-packages textarea:focus,
+.admin-packages select:focus {
+  border: 1.5px solid #2196F3;
+  outline: none;
+}
+
+.admin-packages textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+
+.admin-packages label {
+  font-weight: 500;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.admin-packages .admin-pkg-images {
+  margin-bottom: 16px;
+}
+
+.admin-packages .admin-pkg-image-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.admin-packages .admin-pkg-image-row input {
+  flex: 1;
+}
+
+.admin-packages .admin-pkg-image-row button {
+  margin-left: 8px;
+  color: #f44336;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.admin-packages .admin-pkg-image-row button:hover {
+  color: #b71c1c;
+}
+
+.admin-packages .admin-pkg-add-image {
+  margin-top: 8px;
+  background: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background 0.2s;
+}
+
+.admin-packages .admin-pkg-add-image:hover {
+  background: #1769aa;
+}
+
+.admin-packages .admin-pkg-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+}
+
+.admin-packages .admin-pkg-table th,
+.admin-packages .admin-pkg-table td {
+  border: 1px solid #eee;
+  padding: 10px 8px;
+  text-align: left;
+}
+
+.admin-packages .admin-pkg-table th {
+  background: #f5f7fa;
+  font-weight: 600;
+}
+
+.admin-packages .admin-pkg-table tr:hover {
+  background: #f0f7ff;
+}
+
+.admin-packages .admin-pkg-actions button {
+  margin-right: 8px;
+  background: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background 0.2s;
+}
+
+.admin-packages .admin-pkg-actions button:last-child {
+  background: #f44336;
+}
+
+.admin-packages .admin-pkg-actions button:hover {
+  opacity: 0.85;
+}
+
+.admin-packages .admin-pkg-cancel {
+  margin-top: 8px;
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 15px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+
+.admin-packages .admin-pkg-cancel:hover {
+  background: #b71c1c;
+}
+
+.admin-panel {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f7fafd;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+}
+
+.admin-panel-header {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 32px;
+  color: #1a237e;
+}
+
+.admin-panel-tabs {
+  display: flex;
+  border-bottom: 2px solid #e3e8ee;
+  margin-bottom: 32px;
+  gap: 8px;
+}
+
+.admin-btn {
+  padding: 10px 28px;
+  border: none;
+  border-radius: 6px 6px 0 0;
+  background: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  outline: none;
+  transition: background 0.2s, color 0.2s;
+}
+.admin-btn-primary {
+  background: #2196f3;
+  color: #fff;
+  border-bottom: 3px solid #1976d2;
+}
+.admin-btn-danger {
+  background: #f44336;
+  color: #fff;
+  border-bottom: 3px solid #b71c1c;
+}
+.admin-btn:not(.admin-btn-primary):hover {
+  background: #e3e8ee;
+}
+.admin-btn-primary:hover {
+  background: #1976d2;
+}
+.admin-btn-danger:hover {
+  background: #b71c1c;
+}
+
+.admin-panel-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px 28px;
+  margin-bottom: 32px;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.03);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  margin-top: 16px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.03);
+}
+.admin-table th, .admin-table td {
+  border: 1px solid #e3e8ee;
+  padding: 12px 16px;
+  text-align: left;
+}
+.admin-table th {
+  background: #f5f7fa;
+  font-weight: 600;
+  color: #1a237e;
+}
+.admin-table tr:nth-child(even) {
+  background: #f9fbfd;
+}
+.admin-table tr:hover {
+  background: #e3e8ee;
+}
+.admin-pkg-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 32px;
+}
+.admin-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.admin-form-group input,
+.admin-form-group textarea,
+.admin-form-group select {
+  padding: 10px 12px;
+  border: 1px solid #e3e8ee;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #f9fbfd;
+  transition: border 0.2s;
+}
+.admin-form-group input:focus,
+.admin-form-group textarea:focus,
+.admin-form-group select:focus {
+  border: 1.5px solid #2196f3;
+  outline: none;
+}
+.admin-error {
+  color: #f44336;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.admin-pkg-image-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.admin-pkg-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #e3e8ee;
+  margin-left: 8px;
+}
+.admin-pkg-add-image {
+  margin-top: 8px;
+} 
